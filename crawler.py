@@ -14,6 +14,8 @@ from proxy import ProxyPool
 logging.basicConfig(format='%(levelname)s %(asctime)s %(funcName)s : %(message)s', level=logging.DEBUG)
 logger = logging.getLogger('crawler')
 
+sema = None
+
 
 class City:
 
@@ -53,17 +55,21 @@ class Crawler:
         self.proxy_pool = ProxyPool(loop)
 
     async def get_bike(self, lat, lon):
+        print("get_bike")
         proxy = self.proxy_pool.pick()
-        async with aiohttp.ClientSession(loop=self.loop) as session:
-            with async_timeout.timeout(3, loop=self.loop):
+        async with sema:
+            with async_timeout.timeout(2, loop=self.loop):
                 try:
-                    async with session.post(url=self.mobike_url,
-                                            headers=self.headers,
-                                            data=self.data_format.format(lat, lon),
-                                            proxy=proxy.url,
-                                            ) as resp:
+                    async with aiohttp.request(
+                            method='POST',
+                            url=self.mobike_url,
+                            headers=self.headers,
+                            data=self.data_format.format(lat, lon),
+                            proxy=proxy.url,
+                    ) as resp:
                         ret = await resp.json()
                         if ret:
+                            logger.info("success proxy: %s", proxy.url)
                             self.save(ret)
                 except Exception as e:
                     proxy.error()
@@ -77,11 +83,14 @@ class Crawler:
         logger.info("start")
         total = 1
         lat_range = np.arange(self.left, self.right, -self.offset)
+        future_list = []
         for lat in lat_range:
             lon_range = np.arange(self.top, self.bottom, self.offset)
             for lon in lon_range:
                 total += 1
-                await self.get_bike(lat, lon)
+                future_list.append(asyncio.Task(self.get_bike(lat, lon)))
+        for task in future_list:
+            await task
         logger.info("get %s", str(total))
         logger.info("done")
 
@@ -93,6 +102,8 @@ def init_config():
 def run():
     init_config()
     loop = asyncio.get_event_loop()
+    global sema
+    sema = asyncio.Semaphore(200, loop=loop)
     crawler = Crawler(loop)
     loop.run_until_complete(crawler.run())
 
