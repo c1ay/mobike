@@ -2,5 +2,5 @@
 while true; do
     git pull
     echo "Started"
-    python3 crawler.py
+    python3.5 crawler.py
 done

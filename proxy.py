@@ -30,7 +30,7 @@ class ProxyPool:
         # resp = requests.get(self.proxy_url, timeout=10)
         # proxy = resp.json()
         # self.proxies = list(map(lambda item: Proxy(item), proxy))
-        res = requests.get('http://127.0.0.1:8000/?types=0&count=5&country=国内&count=500')
+        res = requests.get('http://proxy:8000/?types=0&count=5&country=国内&count=500')
         ret = res.json()
         self.proxies = list(map(lambda p: Proxy(url="http://{}:{}".format(p[0], p[1])), ret))
 
