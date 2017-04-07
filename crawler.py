@@ -74,7 +74,10 @@ class Crawler:
                 except Exception as e:
                     proxy.error()
                     logger.error("get bike error: %s, lat: %s, lon: %s", str(e), str(lat), str(lon))
-            sema.release()
+                finally:
+                    self.total += 1
+                    logger.info("success: %s", str(self.total))
+            #  sema.release()
 
     def save(self, ret):
         for item in ret['object']:
@@ -82,18 +85,17 @@ class Crawler:
 
     async def run(self):
         logger.info("start")
-        total = 1
+        self.total = 1
         start = int(time.time())
         lat_range = np.arange(self.left, self.right, -self.offset)
         future_list = []
         for lat in lat_range:
             lon_range = np.arange(self.top, self.bottom, self.offset)
             for lon in lon_range:
-                total += 1
                 future_list.append(asyncio.Task(self.get_bike(lat, lon)))
         for task in future_list:
             await task
-        logger.info("get %s", str(total))
+        logger.info("get %s", str(self.total))
         logger.info("done cast: %s", str(int(time.time()) - start))
 
 
@@ -105,7 +107,7 @@ def run():
     init_config()
     loop = asyncio.get_event_loop()
     global sema
-    sema = asyncio.Semaphore(200, loop=loop)
+    sema = asyncio.Semaphore(300, loop=loop)
     crawler = Crawler(loop)
     loop.run_until_complete(crawler.run())
 
