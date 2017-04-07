@@ -56,7 +56,6 @@ class Crawler:
         self.proxy_pool = ProxyPool(loop)
 
     async def get_bike(self, lat, lon):
-        print("get_bike")
         proxy = self.proxy_pool.pick()
         async with sema:
             with async_timeout.timeout(2, loop=self.loop):
