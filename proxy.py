@@ -3,6 +3,7 @@ import random
 
 import requests
 
+
 class Proxy:
 
     def __init__(self, url):
@@ -24,15 +25,14 @@ class ProxyPool:
         self.loop = loop
         self.proxies = []
         self._get_new_proxy()
-        # self.loop.create_task(self._get_new_proxy())
 
     def _get_new_proxy(self):
-        resp = requests.get(self.proxy_url, timeout=10)
-        proxy = resp.json()
-        self.proxies = list(map(lambda item: Proxy(item), proxy))
-        #  res = requests.get('http://:8000/?types=0&count=5&country=国内&count=100')
-        #  ret = res.json()
-        #  self.proxies = list(map(lambda p: Proxy(url="http://{}:{}".format(p[0], p[1])), ret))
+        # resp = requests.get(self.proxy_url, timeout=10)
+        # proxy = resp.json()
+        # self.proxies = list(map(lambda item: Proxy(item), proxy))
+        res = requests.get('http://127.0.0.1:8000/?types=0&count=5&country=国内&count=300')
+        ret = res.json()
+        self.proxies = list(map(lambda p: Proxy(url="http://{}:{}".format(p[0], p[1])), ret))
 
     def pick(self):
         self.proxies.sort(key=lambda item: item.rank_score, reverse=True)
