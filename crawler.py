@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import async_timeout
+import time
 
 import aiohttp
 import uvloop
@@ -83,6 +84,7 @@ class Crawler:
     async def run(self):
         logger.info("start")
         total = 1
+        start = int(time.time())
         lat_range = np.arange(self.left, self.right, -self.offset)
         future_list = []
         for lat in lat_range:
@@ -93,7 +95,7 @@ class Crawler:
         for task in future_list:
             await task
         logger.info("get %s", str(total))
-        logger.info("done")
+        logger.info("done cast: %s", str(int(time.time()) - start))
 
 
 def init_config():
