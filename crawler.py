@@ -1,5 +1,7 @@
 # coding:utf-8
 import asyncio
+import logging
+import async_timeout
 
 import aiohttp
 import uvloop
@@ -7,6 +9,10 @@ import numpy as np
 
 from model import BikeLocation
 from proxy import ProxyPool
+
+
+logging.basicConfig(format='%(levelname)s %(asctime)s %(funcName)s : %(message)s', level=logging.DEBUG)
+logger = logging.getLogger('crawler')
 
 
 class City:
@@ -49,38 +55,35 @@ class Crawler:
     async def get_bike(self, lat, lon):
         proxy = self.proxy_pool.pick()
         async with aiohttp.ClientSession(loop=self.loop) as session:
-            try:
-                print(self.data_format.format(lat, lon))
-                print(proxy.url)
-                async with session.post(url=self.mobike_url,
-                                        headers=self.headers,
-                                        data=self.data_format.format(lat, lon),
-                                        proxy=proxy.url,
-                                        timeout=10) as resp:
-                    print(resp.text)
-                    return await resp.json()
-            except Exception as e:
-                print("get_bike error: ", e)
-                proxy.error()
+            with async_timeout.timeout(3, loop=self.loop):
+                try:
+                    async with session.post(url=self.mobike_url,
+                                            headers=self.headers,
+                                            data=self.data_format.format(lat, lon),
+                                            proxy=proxy.url,
+                                            ) as resp:
+                        ret = await resp.json()
+                        if ret:
+                            self.save(ret)
+                except Exception as e:
+                    proxy.error()
+                    logger.error("get bike error: %s, lat: %s, lon: %s", str(e))
 
     def save(self, ret):
-        print('save: ', ret)
         for item in ret['object']:
             BikeLocation.new_location(item)
 
     async def run(self):
+        logger.info("start")
+        total = 1
         lat_range = np.arange(self.left, self.right, -self.offset)
         for lat in lat_range:
             lon_range = np.arange(self.top, self.bottom, self.offset)
             for lon in lon_range:
-                try:
-                    ret = await self.get_bike(lat, lon)
-                    print("ret: ", ret)
-                    if ret:
-                        self.save(ret)
-                except Exception as e:
-                    print("run error:", e)
-                    continue
+                total += 1
+                await self.get_bike(lat, lon)
+        logger.info("get %s", str(total))
+        logger.info("done")
 
 
 def init_config():
