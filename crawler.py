@@ -67,7 +67,7 @@ class Crawler:
                             self.save(ret)
                 except Exception as e:
                     proxy.error()
-                    logger.error("get bike error: %s, lat: %s, lon: %s", str(e))
+                    logger.error("get bike error: %s, lat: %s, lon: %s", str(e), str(lat), str(lon))
 
     def save(self, ret):
         for item in ret['object']:
