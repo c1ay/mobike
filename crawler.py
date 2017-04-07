@@ -74,6 +74,7 @@ class Crawler:
                 except Exception as e:
                     proxy.error()
                     logger.error("get bike error: %s, lat: %s, lon: %s", str(e), str(lat), str(lon))
+            sema.release()
 
     def save(self, ret):
         for item in ret['object']:
