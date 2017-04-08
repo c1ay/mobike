@@ -19,18 +19,13 @@ class Proxy:
 
 class ProxyPool:
 
-    proxy_url = "https://jsonblob.com/api/jsonBlob/31bf2dc8-00e6-11e7-a0ba-e39b7fdbe78b"
-
     def __init__(self, loop):
         self.loop = loop
         self.proxies = []
         self._get_new_proxy()
 
     def _get_new_proxy(self):
-        # resp = requests.get(self.proxy_url, timeout=10)
-        # proxy = resp.json()
-        # self.proxies = list(map(lambda item: Proxy(item), proxy))
-        res = requests.get('http://proxy:8000/?types=0&count=5&country=国内&count=500')
+        res = requests.get('http://proxy:8000/?types=0&count=500')
         ret = res.json()
         self.proxies = list(map(lambda p: Proxy(url="http://{}:{}".format(p[0], p[1])), ret))
 
