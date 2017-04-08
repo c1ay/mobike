@@ -58,7 +58,7 @@ class Crawler:
     async def get_bike(self, lat, lon):
         proxy = self.proxy_pool.pick()
         async with sema:
-            with async_timeout.timeout(2, loop=self.loop):
+            with async_timeout.timeout(5, loop=self.loop):
                 try:
                     async with aiohttp.request(
                             method='POST',
@@ -105,7 +105,7 @@ def init_config():
 
 
 def run():
-    init_config()
+    #  init_config()
     loop = asyncio.get_event_loop()
     global sema
     sema = asyncio.Semaphore(300, loop=loop)

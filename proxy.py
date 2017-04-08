@@ -11,10 +11,10 @@ class Proxy:
         self.rank_score = 0
 
     def used(self):
-        self.rank_score += 1
+        self.rank_score += 2
 
     def error(self):
-        self.rank_score -= 10
+        self.rank_score -= 15
 
     def __str__(self):
         return '<{}, score:{}>'.format(self.url, self.rank_score)
@@ -37,6 +37,6 @@ class ProxyPool:
 
     def pick(self):
         self.proxies.sort(key=lambda item: item.rank_score)
-        proxy = random.choice(self.proxies[:50])
+        proxy = random.choice(self.proxies[:30])
         proxy.used()
         return proxy
