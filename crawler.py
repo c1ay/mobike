@@ -97,6 +97,7 @@ class Crawler:
             await task
         logger.info("get %s", str(self.total))
         logger.info("done cast: %s", str(int(time.time()) - start))
+        logger.info("proxys: %s", str(self.proxy_pool.proxies))
 
 
 def init_config():

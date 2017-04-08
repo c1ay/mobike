@@ -14,6 +14,7 @@ class MoBike(db.Entity):
     bike_id = Required(str, 12)
     bike_type = Required(int)
     location = Set('BikeLocation')
+    create_time = Required(datetime)
 
 
 class BikeLocation(db.Entity):
@@ -29,10 +30,10 @@ class BikeLocation(db.Entity):
     @classmethod
     @db_session
     def new_location(cls, ret):
-        logger.info('new location: %s', str(ret))
+        logger.info("new %s", str(ret))
         bike = MoBike.get(bike_id=ret['bikeIds'])
         if not bike:
-            bike = MoBike(bike_id=ret['bikeIds'], bike_type=ret['biketype'])
+            bike = MoBike(bike_id=ret['bikeIds'], bike_type=ret['biketype'], create_time=datetime.now())
         commit()
         cls(dist_id=ret['distId'],
             dist_num=ret['distNum'],
