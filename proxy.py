@@ -31,9 +31,9 @@ class ProxyPool:
         self._get_new_proxy()
 
     def _get_new_proxy(self):
-        res = requests.get('http://proxy:8000/?types=0&count=500')
+        res = requests.get('http://proxy:8000/proxy?protocol=0')
         ret = res.json()
-        self.proxies = list(map(lambda p: Proxy(url="http://{}:{}".format(p[0], p[1])), ret))
+        self.proxies = list(map(lambda p: Proxy(p), ret))
 
     def pick(self):
         self.proxies.sort(key=lambda item: item.rank_score)
