@@ -2,3 +2,5 @@
 *__pycache__
 *.db
 *.sqlite
+*node_modules
+*.log
