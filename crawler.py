@@ -112,5 +112,6 @@ def run():
     crawler = Crawler(loop)
     loop.run_until_complete(crawler.run())
 
+
 if __name__ == '__main__':
     run()
