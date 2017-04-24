@@ -5,7 +5,6 @@ import async_timeout
 import time
 
 import aiohttp
-import uvloop
 import numpy as np
 
 from model import BikeLocation
@@ -98,10 +97,6 @@ class Crawler:
         logger.info("get %s", str(self.total))
         logger.info("done cast: %s", str(int(time.time()) - start))
         logger.info("proxys: %s", str(self.proxy_pool.proxies))
-
-
-def init_config():
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 def run():
