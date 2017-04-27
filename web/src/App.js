@@ -5,6 +5,7 @@ import $ from 'jquery'
 import './App.css';
 
 const { Header, Content, Footer } = Layout
+const API = 'http://localhost:12345'
 
 
 class Body extends Component {
@@ -44,22 +45,23 @@ const randomMarker = (len) => (
 );
 
 function loadMarker() {
-  $.ajax('baidu.com')
+  return $.ajax(API);
 };
 
 class BikeMap extends Component {
   constructor() {
     super();
     this.markers = randomMarker(100);
-    this.info = loadMarker();
+    this.loactions = loadMarker();
+    console.log(this.loactions)
   }
   render() {
     return (
       <div style={{ paddingTop: 30, display: 'flex'}} >
-        <div style={{ width: '60%', height: 500, margin: 'auto' }}>
+        <div style={{ width: '60%', height: 800, margin: 'auto' }}>
           <Map zoom={12} plugins={["ToolBar"]} >
             <Markers
-              markers={this.markers}
+              markers={this.loactions}
             />
           </Map>
         </div>
