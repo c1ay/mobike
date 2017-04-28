@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Map, Markers} from 'react-amap'
-import {Layout, Menu} from 'antd'
-import $ from 'jquery'
+import { Map, Markers, Marker} from 'react-amap'
+import {Layout, Menu, DatePicker, TimePicker, Button} from 'antd'
+import moment from 'moment'
+import axios from 'axios'
 import './App.css';
 
 const { Header, Content, Footer } = Layout
@@ -24,14 +25,88 @@ class Body extends Component {
           </Menu>
         </Header>
         <Content style={{ padding: '0 50px' }}>
-          {/*<div style={{ background: '#fff', padding: 24, minHeight: 280 }}>Content</div>*/}
-          <BikeMap />
+          <Container />
         </Content>
         <Footer style={{ textAlign: 'center' }}>
           MoBike ©2017 Created by c1ay
       </Footer>
       </Layout>
     );
+  }
+}
+
+class Container extends Component {
+
+  constructor () {
+    super();
+    this.state = {
+      locations: {}
+    }
+    this.changeTime = this.changeTime.bind(this);
+    this.changeTime('');
+  }
+
+  changeTime (time) {
+    // this.setState({timeRange: time});
+    axios.get(API, { 
+      params: {
+        timeRange: time
+      }
+    }).then(function(response){
+      this.setState({
+        locations: response.data
+      });
+    }.bind(this))
+
+  } 
+
+  render () {
+    return (
+      <div style={{ padding: 10 }}>
+        <TimeSearch changeTime={this.changeTime}/>
+        <BikeMap locations={this.state.locations}/>
+      </div>
+    )
+  }
+}
+
+class TimeSearch extends Component {
+
+  constructor(){
+    super();
+    this.state = {
+      loading: false,
+      date: "",
+      time: ""
+    };
+  }
+
+  setDate = (value, dateString) => {
+    this.setState({date: dateString})
+  }
+
+  setTime = (value, time) => {
+    this.setState({time: time})
+  }
+
+  bikeSearch = () => {
+    this.setState({'loading': true})
+    this.props.changeTime(this.state.date + ' ' + this.state.time);
+    this.setState({'loading': false})
+  }
+
+  render() {
+    return (
+      <div style={{ display: 'flex', padding: 30 }}>
+        <div style={{ margin: 'auto' }}>
+          <DatePicker format="YYYY-MM-DD" size='large' defaultValue={moment()} onChange={this.setDate}/>
+          <TimePicker format="HH" size='large' defaultValue={moment()} onChange={this.setTime} />
+          <Button icon="search" type="primary" loading={this.state.loading} onClick={this.bikeSearch.bind(this)}>
+            Search
+          </Button>
+        </div>
+      </div>
+    )
   }
 }
 
@@ -44,24 +119,15 @@ const randomMarker = (len) => (
   }))
 );
 
-function loadMarker() {
-  return $.ajax(API);
-};
-
 class BikeMap extends Component {
-  constructor() {
-    super();
-    this.markers = randomMarker(100);
-    this.loactions = loadMarker();
-    console.log(this.loactions)
-  }
   render() {
+    console.log(this.props.locations);
     return (
       <div style={{ paddingTop: 30, display: 'flex'}} >
         <div style={{ width: '60%', height: 800, margin: 'auto' }}>
           <Map zoom={12} plugins={["ToolBar"]} >
-            <Markers
-              markers={this.loactions}
+            <Marker
+              position={this.props.locations}
             />
           </Map>
         </div>
