@@ -18,15 +18,15 @@ CORS(app)
 def home(request):
     print(request.args)
     time_range = request.args.get('timeRange')
-    time = datetime.strptime(time_range, "%Y-%M-%d %H")
+    time = datetime.strptime(time_range, "%Y-%m-%d %H:%M")
     print(time)
-    locations = BikeLocation.select(lambda l: l.time >= time and l.time <time+timedelta(hours=1))
+    locations = BikeLocation.select(lambda l: l.time >= time and l.time <time+timedelta(minutes=10))
     ret = [{
         'longitude': item.x,
         'latitude': item.y
     } for item in locations]
-    return json([ret])
+    return json(ret)
 
 
 if __name__ == '__main__':
-    app.run(port='12345', debug=True)
+    app.run(host='0.0.0.0', port='12345', debug=True)
