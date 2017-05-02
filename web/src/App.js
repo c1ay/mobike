@@ -6,7 +6,7 @@ import axios from 'axios'
 import './App.css';
 
 const { Header, Content, Footer } = Layout
-const API = 'http://localhost:12345'
+const API = 'http://bike:12345'
 
 
 class Body extends Component {
@@ -100,7 +100,7 @@ class TimeSearch extends Component {
       <div style={{ display: 'flex', padding: 30 }}>
         <div style={{ margin: 'auto' }}>
           <DatePicker format="YYYY-MM-DD" size='large' defaultValue={moment()} onChange={this.setDate} />
-          <TimePicker format="HH" size='large' defaultValue={moment()} onChange={this.setTime} />
+          <TimePicker format="HH:mm" size='large' defaultValue={moment()} onChange={this.setTime} />
           <Button icon="search" type="primary" loading={this.state.loading} onClick={this.bikeSearch.bind(this)}>
             Search
           </Button>

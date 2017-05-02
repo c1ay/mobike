@@ -55,28 +55,30 @@ class Crawler:
         self.proxy_pool = ProxyPool(loop)
 
     async def get_bike(self, lat, lon):
-        proxy = self.proxy_pool.pick()
-        async with sema:
-            with async_timeout.timeout(5, loop=self.loop):
-                try:
-                    async with aiohttp.request(
-                            method='POST',
-                            url=self.mobike_url,
-                            headers=self.headers,
-                            data=self.data_format.format(lat, lon),
-                            proxy=proxy.url,
-                    ) as resp:
-                        ret = await resp.json()
-                        if ret:
-                            logger.info("success proxy: %s", proxy.url)
-                            self.save(ret)
-                except Exception as e:
-                    proxy.error()
-                    logger.error("get bike error: %s, lat: %s, lon: %s", str(e), str(lat), str(lon))
-                finally:
-                    self.total += 1
-                    logger.info("success: %s", str(self.total))
-            #  sema.release()
+        error_count = 0
+        while error_count < 10:
+            proxy = self.proxy_pool.pick()
+            async with sema:
+                with async_timeout.timeout(5, loop=self.loop):
+                    try:
+                        async with aiohttp.request(
+                                method='POST',
+                                url=self.mobike_url,
+                                headers=self.headers,
+                                data=self.data_format.format(lat, lon),
+                                proxy=proxy.url,
+                        ) as resp:
+                            ret = await resp.json()
+                            if ret:
+                                logger.info("success proxy: %s", proxy.url)
+                                self.save(ret)
+                    except Exception as e:
+                        proxy.error()
+                        error_count += 1
+                        logger.error("get bike error: %s, lat: %s, lon: %s", str(e), str(lat), str(lon))
+                    finally:
+                        self.total += 1
+                        logger.info("success: %s", str(self.total))
 
     def save(self, ret):
         for item in ret['object']:
