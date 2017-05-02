@@ -103,7 +103,7 @@ def run():
     #  init_config()
     loop = asyncio.get_event_loop()
     global sema
-    sema = asyncio.Semaphore(300, loop=loop)
+    sema = asyncio.Semaphore(30, loop=loop)
     crawler = Crawler(loop)
     loop.run_until_complete(crawler.run())
 

@@ -5,7 +5,8 @@ from datetime import datetime
 from pony.orm import Database, Required, db_session
 
 db = Database()
-db.bind('sqlite', 'bike.sqlite', create_db=True)
+# db.bind('sqlite', 'bike.sqlite', create_db=True)
+db.bind('mysql', host='localhost', user='proxy', passwd='proxy@2017', db='proxy', port=33067)
 logger = logging.getLogger('model')
 
 
