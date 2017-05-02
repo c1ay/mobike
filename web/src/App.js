@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, Markers, Marker} from 'react-amap'
+import { Map, Marker} from 'react-amap'
 import {Layout, Menu, DatePicker, TimePicker, Button} from 'antd'
 import moment from 'moment'
 import axios from 'axios'
@@ -40,7 +40,7 @@ class Container extends Component {
   constructor () {
     super();
     this.state = {
-      locations: {}
+      locations: []
     }
     this.changeTime = this.changeTime.bind(this);
     this.changeTime('');
@@ -48,7 +48,7 @@ class Container extends Component {
 
   changeTime (time) {
     // this.setState({timeRange: time});
-    axios.get(API, { 
+    axios.get(API + "/bike/mobike", { 
       params: {
         timeRange: time
       }
@@ -99,7 +99,7 @@ class TimeSearch extends Component {
     return (
       <div style={{ display: 'flex', padding: 30 }}>
         <div style={{ margin: 'auto' }}>
-          <DatePicker format="YYYY-MM-DD" size='large' defaultValue={moment()} onChange={this.setDate}/>
+          <DatePicker format="YYYY-MM-DD" size='large' defaultValue={moment()} onChange={this.setDate} />
           <TimePicker format="HH" size='large' defaultValue={moment()} onChange={this.setTime} />
           <Button icon="search" type="primary" loading={this.state.loading} onClick={this.bikeSearch.bind(this)}>
             Search
@@ -110,25 +110,33 @@ class TimeSearch extends Component {
   }
 }
 
-const randomMarker = (len) => (
-  Array(len).fill(true).map((e, idx) => ({
-    position: {
-      longitude: 103.93 + Math.random() * 0.3,
-      latitude: 30.48 + Math.random() * 0.3,
-    }
-  }))
-);
 
 class BikeMap extends Component {
+
+  getMarkers(locations) {
+    return locations.map((item) => 
+      <Marker
+        position={item}
+      />
+    )
+  }
+
   render() {
     console.log(this.props.locations);
+    var locations = [];
+    for (var i=0; i<this.props.locations.length;i++){
+      locations.push(
+        <Marker position={this.props.locations[i]}/>
+      )
+    }
     return (
       <div style={{ paddingTop: 30, display: 'flex'}} >
         <div style={{ width: '60%', height: 800, margin: 'auto' }}>
           <Map zoom={12} plugins={["ToolBar"]} >
-            <Marker
-              position={this.props.locations}
-            />
+              {/*<Marker
+                position={this.props.locations}*/}
+              />
+              {locations}
           </Map>
         </div>
       </div>
