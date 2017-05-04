@@ -1,5 +1,0 @@
-requests
-pony
-aiohttp
-numpy
-async_timeout
