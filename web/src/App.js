@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, Marker} from 'react-amap'
+import { Map, Marker, AMap} from 'react-amap'
 import {Layout, Menu, DatePicker, TimePicker, Button} from 'antd'
 import moment from 'moment'
 import axios from 'axios'
@@ -43,7 +43,7 @@ class Container extends Component {
       locations: []
     }
     this.changeTime = this.changeTime.bind(this);
-    this.changeTime('');
+    // this.changeTime('');
   }
 
   changeTime (time) {
@@ -113,6 +113,42 @@ class TimeSearch extends Component {
 
 class BikeMap extends Component {
 
+  constructor() {
+    super();
+    const _this = this;
+    this.map = null;
+    this.heatmap = null;
+    this.amapEvents = {
+      created: (map) => {
+        console.log('000')
+        console.log(map.getZoom());
+        map.plugin(["AMap.Heatmap"], () => {
+          _this.heatmap = new AMap.Heatmap(map, {
+            radius: 25, //给定半径
+            opacity: [0, 0.8]
+            /*,gradient:{
+             0.5: 'blue',
+             0.65: 'rgb(117,211,248)',
+             0.7: 'rgb(0, 255, 0)',
+             0.9: '#ffea00',
+             1.0: 'red'
+             }*/
+        });
+        console.log('222')
+
+        _this.heatmap.setDataSet({
+          data: [{"lng":116.191031,"lat":39.988585,"count":10},{"lng":116.389275,"lat":39.925818,"count":100},
+          {"lng":116.287444,"lat":39.810742,"count":12},{"lng":116.481707,"lat":39.940089,"count":13},
+          {"lng":116.410588,"lat":39.880172,"count":14},{"lng":116.394816,"lat":39.91181,"count":15},
+          {"lng":116.416002,"lat":39.952917,"count":16},{"lng":116.39671,"lat":39.924903,"count":17}],
+          max: 100
+        });
+        console.log('333')
+        })
+      }
+    };
+  }
+
   getMarkers(locations) {
     return locations.map((item) => 
       <Marker
@@ -132,11 +168,11 @@ class BikeMap extends Component {
     return (
       <div style={{ paddingTop: 30, display: 'flex'}} >
         <div style={{ width: '60%', height: 800, margin: 'auto' }}>
-          <Map zoom={12} plugins={["ToolBar"]} >
+          <Map zoom={12} plugins={["ToolBar"]} events={this.amapEvents}>
               {/*<Marker
                 position={this.props.locations}*/}
               />
-              {locations}
+              {/*{locations}*/}
           </Map>
         </div>
       </div>
