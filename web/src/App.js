@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, Marker, AMap} from 'react-amap'
+import { Map, Marker} from 'react-amap'
 import {Layout, Menu, DatePicker, TimePicker, Button} from 'antd'
 import moment from 'moment'
 import axios from 'axios'
@@ -118,32 +118,48 @@ class BikeMap extends Component {
     const _this = this;
     this.map = null;
     this.heatmap = null;
-    this.amapEvents = {
-      created: (map) => {
-        console.log('000')
-        console.log(map.getZoom());
-        map.plugin(["AMap.Heatmap"], () => {
-          _this.heatmap = new AMap.Heatmap(map, {
-            radius: 25, //给定半径
-            opacity: [0, 0.8]
-            /*,gradient:{
-             0.5: 'blue',
-             0.65: 'rgb(117,211,248)',
-             0.7: 'rgb(0, 255, 0)',
-             0.9: '#ffea00',
-             1.0: 'red'
-             }*/
-        });
-        console.log('222')
-
-        _this.heatmap.setDataSet({
-          data: [{"lng":116.191031,"lat":39.988585,"count":10},{"lng":116.389275,"lat":39.925818,"count":100},
-          {"lng":116.287444,"lat":39.810742,"count":12},{"lng":116.481707,"lat":39.940089,"count":13},
-          {"lng":116.410588,"lat":39.880172,"count":14},{"lng":116.394816,"lat":39.91181,"count":15},
-          {"lng":116.416002,"lat":39.952917,"count":16},{"lng":116.39671,"lat":39.924903,"count":17}],
-          max: 100
-        });
-        console.log('333')
+    this.state = {
+      center:{"longitude":104.0650, "latitude":30.6570},
+      // center:{"longitude":116.418261, "latitude": 39.921984},
+      points:[
+          { "lng": 104.025038, "lat": 30.768801, "count": 80 },
+          { "lng": 103.92373, "lat": 30.606077, "count": 30 },
+          { "lng": 104.1735, "lat": 30.562751, "count": 12 },
+          { "lng": 104.141078, "lat": 30.668506, "count": 23 },
+          { "lng": 104.071574, "lat": 30.7207559, "count": 34 },
+          { "lng": 104.105943, "lat": 30.704395, "count": 55 },
+          { "lng": 104.173303, "lat": 30.654361, "count": 10 },
+          { "lng": 104.065694, "lat": 30.500795, "count": 45 },
+          { "lng": 104.145487, "lat": 30.520160, "count": 66 },
+          { "lng": 104.079207, "lat": 30.560209, "count": 7 },
+          { "lng": 104.0652, "lat": 30.6570, "count": 70 },
+          { "lng": 104.0672, "lat": 30.6589, "count": 80 },
+          { "lng": 104.0688, "lat": 30.6575, "count": 60 },
+          { "lng": 104.0688, "lat": 30.6605, "count": 43 },
+          { "lng": 104.0688, "lat": 30.6677, "count": 32 },
+          { "lng": 104.0652, "lat": 30.67011, "count": 77 },
+          { "lng": 104.0652, "lat": 30.64981, "count": 14 },
+          { "lng": 104.0652, "lat": 30.65677, "count": 46 },
+          { "lng": 104.0652, "lat": 30.65588, "count": 45 },
+          { "lng": 104.0708, "lat": 30.6575, "count": 53},
+          { "lng": 104.16191, "lat": 30.564055, "count": 66 },
+          { "lng": 104.0681, "lat": 30.6568, "count": 60 },
+          { "lng": 104.093411, "lat": 30.610457, "count": 54 },
+        ]
+    };
+    this.mapEvents = {
+      created(map) {
+        _this.map = map;
+        map.plugin("AMap.Heatmap", () => {
+          console.log('222');
+          _this.heatmap = new window.AMap.Heatmap(map);
+          console.log('333');
+          _this.heatmap.setDataSet({
+            data: _this.state.points,
+            max: 100
+          });
+          console.log('444');
+          // _this.heatmap.show();
         })
       }
     };
@@ -158,7 +174,7 @@ class BikeMap extends Component {
   }
 
   render() {
-    console.log(this.props.locations);
+    // console.log(this.props.locations);
     var locations = [];
     for (var i=0; i<this.props.locations.length;i++){
       locations.push(
@@ -168,7 +184,7 @@ class BikeMap extends Component {
     return (
       <div style={{ paddingTop: 30, display: 'flex'}} >
         <div style={{ width: '60%', height: 800, margin: 'auto' }}>
-          <Map zoom={12} plugins={["ToolBar"]} events={this.amapEvents}>
+          <Map zoom={12} plugins={["ToolBar"]} events={this.mapEvents} center={this.state.center}>
               {/*<Marker
                 position={this.props.locations}*/}
               />
