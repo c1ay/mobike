@@ -188,7 +188,6 @@ class BikeMap extends Component {
               {/*<Marker
                 position={this.props.locations}*/}
               />
-              {/*{locations}*/}
           </Map>
         </div>
       </div>
